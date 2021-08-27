@@ -1,7 +1,7 @@
 package JDBC.DAO;
 
 
-import JDBC.Exception.conException;
+import com.alibaba.druid.pool.DruidDataSourceFactory;
 
 import java.io.FileInputStream;
 import java.lang.reflect.Field;
@@ -9,6 +9,34 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+
+
+//mysql.properties
+driver=com.mysql.cj.jdbc.Driver
+user=root
+password=bsy8023.00
+url=jdbc:mysql://localhost:3306/jdbc?&useSSL=false&serverTimezone=UTC&characterEncoding=utf8&rewriteBatchedStatements=true
+
+//druid.properties
+username=root
+password=bsy8023.00
+url=jdbc:mysql://localhost:3306/jdbc?&useSSL=false&serverTimezone=UTC&characterEncoding=utf8&rewriteBatchedStatements=true
+#这个可以缺省的，会根据url自动识别
+driverClassName=com.mysql.cj.jdbc.Driver
+
+##初始连接数，默认0
+initialSize=10
+#最大连接数，默认8
+maxActive=30
+#最小闲置数
+minIdle=10
+#获取连接的最大等待时间，单位毫秒
+maxWait=2000
+#缓存PreparedStatement，默认false
+poolPreparedStatements=true
+#缓存PreparedStatement的最大数量，默认-1（不缓存）。大于0时会自动开启缓存PreparedStatement，所以可以省略上一句设置
+maxOpenPreparedStatements=20
+
 
 /**
  * BaseDAO
@@ -21,23 +49,15 @@ public abstract class DAO {
     连接
      */
     public Connection getConnection() throws Exception {
-        //读取配置文件文件
-        FileInputStream fileInputStream = new FileInputStream("G:\\idea\\JDBC\\properties\\mysql.properties");
-        //加载配置文件
-        Properties properties = new Properties();
-        properties.load(fileInputStream);                 //获取连接信息
-        String driver = properties.getProperty("driver");
-        String url = properties.getProperty("url");
-        String user = properties.getProperty("user");
-        String password = properties.getProperty("password");
-        Class.forName(driver);
-        Connection connection = DriverManager.getConnection(url, user, password);
-        if (connection == null) {
-            throw new conException("连接失败!!!!!!");
-        }
-        return connection;
-    }
+//        Properties properties = new Properties();
+//        properties.load(new FileInputStream("G:\\idea\\JDBC\\properties\\mysql.properties"));                 //获取连接信息
+//        Class.forName(properties.getProperty("driver"));
+//        return DriverManager.getConnection(properties.getProperty("url"), properties.getProperty("user"), properties.getProperty("password"));
 
+        Properties properties = new Properties();
+        properties.load(new FileInputStream("G:\\idea\\JDBC\\properties\\druid.properties"));
+        return DruidDataSourceFactory.createDataSource(properties).getConnection();
+    }
     /*
     断开连接
      */
@@ -325,3 +345,6 @@ public abstract class DAO {
         return null;
     }
 }
+
+
+
